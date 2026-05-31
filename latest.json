@@ -1,0 +1,15 @@
+{
+  "version": "0.1.10",
+  "notes": "ClipStack 0.1.10. Download + install info: https://brahmdeep.github.io/clipstack-dl/",
+  "pub_date": "2026-05-31T19:48:29Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVURG9EbjN1NklwdkJ3bTZkWlhDMnY5L1RnYURMTlFodjVCYzd6NE00K0tYSzFwZzFlL29OeVU2Wlo1b3g3c3pIUytIZitVdG10S3Bsd1dQWjRkUHZTcXYwNk1jOEV1bkFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgwMjU2OTA0CWZpbGU6Q2xpcFN0YWNrXzAuMS4xMF94NjQtc2V0dXAuZXhlCjNYR1BiK3VXdFBtbkxwSUMzczV0eUthRjRwUTgxbDRPU1I4K1hWYkVMZWZ0eHRtWTJNYVpKaEJRSjNFQ2duaS9pWTVDcWdmSjh0MjZxaXRXb004d0RRPT0K",
+      "url": "https://brahmdeep.github.io/clipstack-dl/ClipStack_x64-setup.exe"
+    },
+    "windows-x86_64-nsis": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVURG9EbjN1NklwdkJ3bTZkWlhDMnY5L1RnYURMTlFodjVCYzd6NE00K0tYSzFwZzFlL29OeVU2Wlo1b3g3c3pIUytIZitVdG10S3Bsd1dQWjRkUHZTcXYwNk1jOEV1bkFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgwMjU2OTA0CWZpbGU6Q2xpcFN0YWNrXzAuMS4xMF94NjQtc2V0dXAuZXhlCjNYR1BiK3VXdFBtbkxwSUMzczV0eUthRjRwUTgxbDRPU1I4K1hWYkVMZWZ0eHRtWTJNYVpKaEJRSjNFQ2duaS9pWTVDcWdmSjh0MjZxaXRXb004d0RRPT0K",
+      "url": "https://brahmdeep.github.io/clipstack-dl/ClipStack_x64-setup.exe"
+    }
+  }
+}

@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClipStack — Everything you copy. Always there.</title>
+  <meta name="description" content="ClipStack is a free clipboard manager for Windows. Never lose a copied item again — automatic history, instant search, pinned clips, and quick-paste hotkeys." />
+
+  <!-- Open Graph / social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ClipStack — Everything you copy. Always there." />
+  <meta property="og:description" content="A free clipboard manager for Windows. Automatic history, instant search, pinned clips, quick-paste hotkeys." />
+  <meta property="og:url" content="https://brahmdeep.github.io/clipstack-dl/" />
+  <meta property="og:image" content="https://brahmdeep.github.io/clipstack-dl/icon.png" />
+  <meta name="theme-color" content="#1a1a2e" />
+
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --bg-2: #14142a;
+      --panel: rgba(255, 255, 255, 0.04);
+      --panel-strong: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text: #e8e8f2;
+      --text-2: #b7b7cc;
+      --muted: #8181a0;
+      --cyan: #4fc3f7;
+      --blue: #29b6f6;
+      --amber: #ffb74d;
+      --grad: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+      --grad-text: linear-gradient(120deg, #7fd5ff 0%, #4fc3f7 45%, #ffce80 110%);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --maxw: 1120px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    /* Ambient gradient blobs */
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    body::before {
+      width: 620px; height: 620px;
+      top: -240px; left: -180px;
+      background: radial-gradient(circle, rgba(79, 195, 247, 0.55), transparent 70%);
+    }
+    body::after {
+      width: 560px; height: 560px;
+      top: 220px; right: -220px;
+      background: radial-gradient(circle, rgba(255, 183, 77, 0.30), transparent 70%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+    /* ---------- Nav ---------- */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(13, 13, 26, 0.6);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 66px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; font-size: 18px; letter-spacing: -0.2px; }
+    .brand img { width: 30px; height: 30px; display: block; }
+    .nav__right { display: flex; align-items: center; gap: 16px; }
+    .nav__ver { font-size: 13px; color: var(--muted); }
+    .nav__link { font-size: 14px; color: var(--text-2); transition: color .15s ease; }
+    .nav__link:hover { color: var(--text); }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-size: 15px; font-weight: 600;
+      padding: 12px 22px; border-radius: 12px;
+      border: 1px solid transparent; cursor: pointer;
+      transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn svg { width: 18px; height: 18px; }
+    .btn--primary {
+      background: var(--grad); color: #06121b;
+      box-shadow: 0 10px 30px -8px rgba(79, 195, 247, 0.55);
+    }
+    .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -8px rgba(79, 195, 247, 0.7); }
+    .btn--sm { padding: 9px 16px; font-size: 14px; border-radius: 10px; }
+    .btn--ghost {
+      background: var(--panel); color: var(--text);
+      border-color: var(--border-strong);
+    }
+    .btn--ghost:hover { background: var(--panel-strong); border-color: var(--cyan); }
+
+    /* ---------- Hero ---------- */
+    .hero { padding: 84px 0 72px; }
+    .hero__grid {
+      display: grid; grid-template-columns: 1.05fr 0.95fr;
+      gap: 56px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; letter-spacing: .3px;
+      color: var(--cyan);
+      background: rgba(79, 195, 247, 0.10);
+      border: 1px solid rgba(79, 195, 247, 0.25);
+      padding: 6px 13px; border-radius: 999px;
+      margin-bottom: 22px;
+    }
+    .eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+    h1 {
+      font-size: clamp(38px, 5.4vw, 60px);
+      line-height: 1.05; letter-spacing: -1.5px; font-weight: 800;
+      margin-bottom: 20px;
+    }
+    h1 .grad {
+      background: var(--grad-text);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .hero p.lede { font-size: 19px; color: var(--text-2); max-width: 520px; margin-bottom: 32px; }
+    .hero__cta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .hero__meta { font-size: 13.5px; color: var(--muted); margin-top: 16px; }
+    .hero__meta strong { color: var(--text-2); font-weight: 600; }
+
+    /* ---------- App mockup ---------- */
+    .mock {
+      width: 100%; max-width: 380px; margin-left: auto;
+      background: linear-gradient(180deg, #1a1a2e, #141426);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02);
+      overflow: hidden;
+      transform: perspective(1400px) rotateY(-9deg) rotateX(3deg);
+      transition: transform .4s ease;
+    }
+    .mock:hover { transform: perspective(1400px) rotateY(-3deg) rotateX(1deg); }
+    .mock__bar { display: flex; align-items: center; gap: 7px; padding: 12px 14px; border-bottom: 1px solid #2a2a4a; }
+    .mock__bar i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+    .mock__bar i:nth-child(1) { background: #ff5f57; }
+    .mock__bar i:nth-child(2) { background: #febc2e; }
+    .mock__bar i:nth-child(3) { background: #28c840; }
+    .mock__body { padding: 14px; }
+    .mock__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+    .mock__title { display: flex; align-items: baseline; gap: 8px; }
+    .mock__title b { color: var(--cyan); font-size: 16px; }
+    .mock__title span { color: var(--muted); font-size: 11px; }
+    .mock__gear { color: var(--muted); font-size: 14px; }
+    .mock__search {
+      background: #16213e; border: 1px solid #2a2a4a; border-radius: 8px;
+      color: var(--muted); font-size: 12px; padding: 9px 12px; margin-bottom: 12px;
+    }
+    .mclip {
+      background: #0f3460; border: 1px solid #2a2a4a; border-radius: 8px;
+      padding: 9px 11px; margin-bottom: 8px;
+    }
+    .mclip--pin { background: #1a3a5c; border-left: 3px solid var(--cyan); }
+    .mclip__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #16213e; color: var(--text-2); }
+    .slot { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--cyan); color: #06121b; letter-spacing: .5px; }
+    .mclip__text { font-size: 12px; color: #d4d4e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mock__ad { border-style: dashed !important; }
+    .tag--ad { background: var(--cyan); color: #06121b; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ---------- Section heads ---------- */
+    section { padding: 64px 0; }
+    .section-head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
+    .section-head h2 { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -0.8px; font-weight: 800; margin-bottom: 14px; }
+    .section-head p { color: var(--text-2); font-size: 17px; }
+
+    /* ---------- Features ---------- */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 26px 24px;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--border-strong); background: var(--panel-strong); }
+    .card__icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: grid; place-items: center; margin-bottom: 16px;
+      background: rgba(79, 195, 247, 0.12); border: 1px solid rgba(79, 195, 247, 0.22);
+    }
+    .card__icon svg { width: 23px; height: 23px; stroke: var(--cyan); }
+    .card h3 { font-size: 17px; margin-bottom: 7px; letter-spacing: -0.2px; }
+    .card p { font-size: 14.5px; color: var(--text-2); }
+
+    /* ---------- Value strip ---------- */
+    .strip {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 34px 28px;
+    }
+    .strip__item { text-align: center; }
+    .strip__big { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+    .strip__big.grad { background: var(--grad-text); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .strip__small { color: var(--text-2); font-size: 14.5px; margin-top: 4px; }
+
+    /* ---------- Download CTA ---------- */
+    .cta {
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(79, 195, 247, 0.16), transparent 60%),
+        var(--panel);
+      border: 1px solid var(--border-strong);
+      border-radius: 24px; padding: 60px 28px;
+    }
+    .cta h2 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -0.8px; font-weight: 800; margin-bottom: 14px; }
+    .cta p { color: var(--text-2); font-size: 17px; margin-bottom: 28px; }
+    .cta__row { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+    .note {
+      max-width: 560px; margin: 26px auto 0;
+      display: flex; gap: 11px; align-items: flex-start; text-align: left;
+      background: rgba(255, 183, 77, 0.08);
+      border: 1px solid rgba(255, 183, 77, 0.22);
+      border-radius: 12px; padding: 14px 16px;
+      font-size: 13.5px; color: var(--text-2);
+    }
+    .note svg { width: 18px; height: 18px; stroke: var(--amber); flex-shrink: 0; margin-top: 1px; }
+    .note b { color: var(--text); }
+
+    /* ---------- Footer ---------- */
+    footer { border-top: 1px solid var(--border); padding: 40px 0; margin-top: 24px; }
+    .footer__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .footer__brand { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-size: 14px; }
+    .footer__brand img { width: 22px; height: 22px; }
+    .footer__meta { color: var(--muted); font-size: 13px; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      .hero__grid { grid-template-columns: 1fr; gap: 48px; }
+      .mock { transform: none; margin: 0 auto; }
+      .mock:hover { transform: none; }
+      .features { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .hero { padding: 56px 0 48px; }
+      .features { grid-template-columns: 1fr; }
+      .strip { grid-template-columns: 1fr; gap: 26px; }
+      .nav__link { display: none; }
+      .hero p.lede { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="#top">
+        <img src="icon.png" alt="ClipStack logo" />
+        ClipStack
+      </a>
+      <nav class="nav__right">
+        <a class="nav__link" href="#features">Features</a>
+        <span class="nav__ver">v0.1.10</span>
+        <a class="btn btn--primary btn--sm" href="ClipStack_x64-setup.exe">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero__grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span> Free for Windows · No account</span>
+          <h1>Everything you copy.<br><span class="grad">Always there.</span></h1>
+          <p class="lede">
+            ClipStack quietly saves everything you copy, so you can find it, pin it,
+            and paste it back in a tap — long after your clipboard would have forgotten.
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="ClipStack_x64-setup.exe">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+              Download for Windows
+            </a>
+            <a class="btn btn--ghost" href="#features">See what it does</a>
+          </div>
+          <p class="hero__meta">
+            <strong>v0.1.10</strong> · Windows 10 &amp; 11 (64-bit) · Free · Auto-updates itself
+          </p>
+        </div>
+
+        <!-- App mockup -->
+        <div class="mock" aria-hidden="true">
+          <div class="mock__bar"><i></i><i></i><i></i></div>
+          <div class="mock__body">
+            <div class="mock__head">
+              <div class="mock__title"><b>ClipStack</b> <span>128 clips</span></div>
+              <span class="mock__gear">⚙</span>
+            </div>
+            <div class="mock__search">🔍  Search your clipboard…</div>
+
+            <div class="mclip mclip--pin">
+              <div class="mclip__top"><span class="tag">EMAIL</span><span class="slot">⌃⇧1</span></div>
+              <div class="mclip__text">hello@example.com</div>
+            </div>
+            <div class="mclip mclip--pin">
+              <div class="mclip__top"><span class="tag">URL</span><span class="slot">⌃⇧2</span></div>
+              <div class="mclip__text">https://brahmdeep.github.io/clipstack-dl/</div>
+            </div>
+            <div class="mclip">
+              <div class="mclip__top"><span class="tag">CODE</span><span style="font-size:10px;color:var(--muted)">just now</span></div>
+              <div class="mclip__text">git commit -m "ship it"</div>
+            </div>
+            <div class="mclip mock__ad">
+              <div class="mclip__top"><span class="tag tag--ad">Ad</span></div>
+              <div class="mclip__text">Sponsored — styled like a clip, never in your way</div>
+            </div>
+            <div class="mclip">
+              <div class="mclip__top"><span class="tag">TEXT</span><span style="font-size:10px;color:var(--muted)">2m ago</span></div>
+              <div class="mclip__text">The quick brown fox jumps over…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>A clipboard with a memory</h2>
+          <p>The default Windows clipboard holds one thing at a time. ClipStack holds everything — organized, searchable, and one tap away.</p>
+        </div>
+        <div class="features">
+          <div class="card">
+            <div class="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg></div>
+            <h3>Never lose a copy</h3>
+            <p>Every copied item is saved automatically and survives restarts. Your history is always there when you need it.</p>
+          </div>
+          <div class="card">
+            <div class="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <h3>Instant search</h3>
+            <p>Full-text search across your entire clipboard history. Find that snippet you copied hours ago in a second.</p>
+          </div>
+          <div class="card">
+            <div class="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3.76a2 2 0 0 0 .59 1.42L18 14H6l2.41-1.82A2 2 0 0 0 9 10.76Z"/></svg></div>
+            <h3>Pin your favorites</h3>
+            <p>Lock the clips you reach for daily — addresses, emails, templates — to the top so they're always one tap away.</p>
+          </div>
+          <div class="card">
+            <div class="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></div>
+            <h3>Smart type detection</h3>
+            <p>Links, code, emails, and phone numbers are detected and labeled automatically — so your history reads at a glance.</p>
+          </div>
+          <div class="card">
+            <div class="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></div>
+            <h3>Quick-paste hotkeys</h3>
+            <p>Ctrl + Shift + 1…9 instantly pastes a pinned clip straight into whatever app you're in. No clicking, no switching.</p>
+          </div>
+          <div class="card">
+            <div class="card__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <h3>Free, forever</h3>
+            <p>No subscription, no paywall, no upsell — just one tidy, native ad. Lives in your tray, opens with a global hotkey.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VALUE STRIP -->
+    <section style="padding-top:0;">
+      <div class="wrap">
+        <div class="strip">
+          <div class="strip__item"><div class="strip__big grad">$0</div><div class="strip__small">No subscription, ever</div></div>
+          <div class="strip__item"><div class="strip__big grad">200+</div><div class="strip__small">Clips kept in history</div></div>
+          <div class="strip__item"><div class="strip__big grad">1 tap</div><div class="strip__small">To re-copy or paste back</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOWNLOAD CTA -->
+    <section id="download">
+      <div class="wrap">
+        <div class="cta">
+          <h2>Get ClipStack</h2>
+          <p>Free for Windows 10 &amp; 11. Installs in seconds and keeps itself up to date.</p>
+          <div class="cta__row">
+            <a class="btn btn--primary" href="ClipStack_x64-setup.exe">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+              Download v0.1.10
+            </a>
+            <a class="btn btn--ghost" href="https://github.com/Brahmdeep/clipstack-dl/releases">All versions</a>
+          </div>
+          <div class="note">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+            <span>On first run, Windows SmartScreen may show <b>“Windows protected your PC”</b> — ClipStack isn't code-signed yet. Click <b>More info → Run anyway</b> to install. It's safe; the warning just means the app is new.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <img src="icon.png" alt="" />
+        <span>ClipStack — Everything you copy. Always there.</span>
+      </div>
+      <div class="footer__meta">v0.1.10 · The latest version is always here.</div>
+    </div>
+  </footer>
+
+</body>
+</html>
